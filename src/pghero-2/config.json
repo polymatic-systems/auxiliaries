@@ -1,0 +1,18 @@
+{
+  "helm": {
+    "repo": {
+      "name": "polymatic",
+      "url": "https://polymatic-systems.github.io/helm-charts"
+    },
+    "chart": {
+      "name": "genero",
+      "version": "1.4.1"
+    }
+  },
+  "service": {
+    "host": "",
+    "port": ""
+  },
+  "notes": "you can find the complete instructions for setting up your database for pghero here:\nhttps://github.com/ankane/pghero/blob/master/guides/Query-Stats.md\nhttps://github.com/ankane/pghero/blob/master/guides/Permissions.md
+\nhttps://github.com/ankane/pghero/blob/master/guides/Linux.md#query-stats"
+}

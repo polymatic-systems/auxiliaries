@@ -1,0 +1,72 @@
+
+default:
+  name: "${AUX_SERVICE_RELEASE}"
+  version: "${AUX_VERSION}"
+  image: docker.io/library/mongo:4.4-focal
+  slug: "${AUX_PREFIX}"
+
+variables:
+- name: init
+  data:
+    MONGO_INITDB_ROOT_USERNAME: "${USER}"
+    MONGO_INITDB_ROOT_PASSWORD: "${PASSWORD}"
+
+volumes:
+- name: config
+  path: /etc
+  file: mongod.conf
+  data:
+    mongod.conf: |
+      systemLog:
+        verbosity: 1
+      cloud:
+        monitoring:
+            free:
+              state: on
+              tags:
+              - ${AUX_SERVICE_RELEASE}
+      storage:
+        directoryPerDB: true
+      operationProfiling:
+        mode: slowOp
+        slowOpThresholdMs: 100
+        slowOpSampleRate: 1.0
+- name: data
+  path: /data/db
+  perpetual: disable
+  pvc:
+    size: "${SIZE}"
+
+deploy:
+  strategy: Recreate
+
+containers:
+- name: app
+  entrypoint:
+    - 'docker-entrypoint.sh'
+  command:
+    - 'mongod'
+    - '-f'
+    - '/etc/mongod.conf'
+  ports:
+    - containerPort: 27017
+  cpu:
+    request: 1000m
+    limit: 1000m
+  memory:
+    request: 4Gi
+    limit: 4Gi
+  probe:
+    exec:
+      - mongo
+      - --eval
+      - >
+        'db.runCommand("ping").ok'
+      - localhost:27017/test
+      - --quiet
+
+svc:
+  ports:
+  - name: tcp
+    port: 27017
+    targetPort: 27017

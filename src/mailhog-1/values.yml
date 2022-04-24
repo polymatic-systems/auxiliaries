@@ -1,0 +1,47 @@
+
+default:
+  name: "${AUX_SERVICE_RELEASE}"
+  version: "${AUX_VERSION}"
+  image: docker.io/mailhog/mailhog:v1.0.0
+  slug: "${AUX_PREFIX}"
+
+variables:
+- name: config
+  data:
+    MH_HOSTNAME: ${AUX_SERVICE_RELEASE}
+
+containers:
+- name: app
+  image: "docker.io/mailhog/mailhog:v1.0.0"
+  ports:
+    - containerPort: 8080
+  cpu:
+    request: 100m
+    limit: 100m
+  memory:
+    request: 512Mi
+    limit: 512Mi
+  probe:
+    path: /
+    port: 8025
+
+svc:
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8025
+  - name: smtp
+    port: 1025
+    targetPort: 1025
+
+conceal: ${ENDPOINT_DISABLE}
+
+ingress:
+- name: ui
+  issuer: "${ENDPOINT_ISSUER}"
+  cert: "${ENDPOINT_CERT}"
+  annotations:
+    external-dns.io/status: "${ENDPOINT_STATUS}"
+    nginx.org/websocket-services: "${AUX_SERVICE_RELEASE}"
+  urls:
+  - "${ENDPOINT_URL}"

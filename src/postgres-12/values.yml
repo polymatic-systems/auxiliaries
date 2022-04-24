@@ -1,0 +1,78 @@
+
+default:
+  name: "${AUX_SERVICE_RELEASE}"
+  version: "${AUX_VERSION}"
+  image: docker.io/library/postgres:12.9-bullseye
+  slug: "${AUX_PREFIX}"
+
+variables:
+- name: init
+  data:
+    POSTGRES_USER: "${USER}"
+    POSTGRES_PASSWORD: "${PASSWORD}"
+
+volumes:
+- name: config
+  path: /etc
+  file: postgres.conf
+  data:
+    postgres.conf: |
+      listen_addresses = '*'
+      authentication_timeout = 10s
+      work_mem = 4MB
+      temp_buffers = 8MB
+      shared_buffers = 1GB
+      effective_cache_size = 3GB
+      maintenance_work_mem = 256MB
+      wal_buffers = 16MB
+      min_wal_size = 1GB
+      max_wal_size = 2GB
+      max_connections = 100
+      log_connections = 'true'
+      log_disconnections = 'true'
+      log_duration = 'true'
+      log_lock_waits = 'true'
+      log_statement = 'all'
+      log_temp_files = 1024
+      log_min_messages = 'INFO'
+      log_min_error_statement = 'WARNING'
+- name: data
+  path: /data/db
+  perpetual: disable
+  pvc:
+    size: "${SIZE}"
+
+priority: "database"
+
+deploy:
+  strategy: Recreate
+
+containers:
+- name: app
+  entrypoint:
+    - 'docker-entrypoint.sh'
+  command:
+    - 'postgres'
+    - '-c'
+    - 'config_file=/etc/postgres.conf'
+  ports:
+    - containerPort: 5432
+  cpu:
+    request: 1000m
+    limit: 1000m
+  memory:
+    request: 4Gi
+    limit: 4Gi
+  probe:
+    exec:
+      - pg_isready
+      - -U
+      - ${USER}
+      - -h
+      - localhost
+
+svc:
+  ports:
+  - name: tcp
+    port: 5432
+    targetPort: 5432

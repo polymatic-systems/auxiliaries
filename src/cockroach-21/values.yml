@@ -1,0 +1,32 @@
+
+conf:
+  single-node: true
+  log:
+    enabled: false
+  logtostderr: INFO
+  cache: 25%
+  max-sql-memory: 25%
+
+statefulset:
+  replicas: 1
+  budget:
+    maxUnavailable: 0
+  priorityClassName: "database"
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 3Gi
+    requests:
+      cpu: 1000m
+      memory: 3Gi
+
+storage:
+  persistentVolume:
+    enabled: true
+    size: ${SIZE}
+
+tls:
+  enabled: false
+
+ingress:
+  enabled: false

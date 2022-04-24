@@ -1,0 +1,17 @@
+{
+  "helm": {
+    "repo": {
+      "name": "elastic",
+      "url": "https://helm.elastic.co"
+    },
+    "chart": {
+      "name": "elasticsearch",
+      "version": "7.10"
+    }
+  },
+  "service": {
+    "host": "elasticsearch-es-default",
+    "port": "9200"
+  },
+  "notes": ""
+}

@@ -1,0 +1,44 @@
+apiVersion: rabbitmq.com/v1beta1
+kind: RabbitmqCluster
+metadata:
+  name: ${AUX_SERVICE_RELEASE}
+spec:
+  replicas: 1
+  imagePullSecrets:
+  - name: registry-hub
+  persistence:
+    storage: ${SIZE}
+  resources:
+    requests:
+      cpu: 1000m
+      memory: 2Gi
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+  override:
+    statefulSet:
+      spec:
+        template:
+          spec:
+            containers: []
+            priorityClassName: database
+  rabbitmq:
+    additionalConfig: |
+      default_user = ${USER}
+      default_pass = ${PASSWORD}
+      log.file.level = info
+      num_acceptors.tcp = 8
+      num_acceptors.ssl = 8
+      handshake_timeout = 10000
+      channel_max = 1023
+      max_message_size = 8388608
+      heartbeat = 30
+      collect_statistics = fine
+      collect_statistics_interval = 10000
+      cluster_partition_handling = ignore
+      ssl_options.fail_if_no_peer_cert = false
+    additionalPlugins:
+      - rabbitmq_management
+      - rabbitmq_top
+      - rabbitmq_shovel
+      - rabbitmq_sharding

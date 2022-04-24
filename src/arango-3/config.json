@@ -1,0 +1,7 @@
+{
+  "service": {
+    "host": "arango",
+    "port": "8529"
+  },
+  "notes": ""
+}

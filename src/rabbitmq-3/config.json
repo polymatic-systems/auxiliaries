@@ -1,0 +1,7 @@
+{
+  "service": {
+    "host": "rabbitmq",
+    "port": "5672"
+  },
+  "notes": "you can find your default credentials at: kubectl -n NAMESPACE get secret INSTANCE-default-user"
+}
