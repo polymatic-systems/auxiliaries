@@ -1,0 +1,37 @@
+apiVersion: database.arangodb.com/v1
+kind: ArangoDeployment
+metadata:
+  name: ${AUX_SERVICE_RELEASE}
+spec:
+  downtimeAllowed: true
+  memberPropagationMode: always
+  networkAttachedVolumes: true # requires NAS (EBS)
+  mode: Cluster
+  image: 'arangodb/arangodb:3.7.10'
+  imagePullSecrets:
+  - registry-hub
+  environment: Single
+  storageEngine: RocksDB
+  dbservers:
+    priorityClassName: "database"
+    allowMemberRecreation: true
+    resources:
+      requests:
+        storage: ${SIZE}
+    pvcResizeMode: runtime
+  externalAccess:
+    type: None
+  metrics:
+    mode: exporter
+    enabled: true
+    image: 'arangodb/arangodb-exporter:0.1.8'
+    tls: false
+  bootstrap:
+    passwordSecretNames:
+      root: None
+  auth:
+    jwtSecretName: None
+  tls:
+    caSecretName: None
+  lifecycle:
+    resources: {}

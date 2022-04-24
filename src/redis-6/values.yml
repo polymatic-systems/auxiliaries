@@ -1,0 +1,57 @@
+
+default:
+  name: "${AUX_SERVICE_RELEASE}"
+  version: "${AUX_VERSION}"
+  image: docker.io/library/redis:6.2-bullseye
+  slug: "${AUX_PREFIX}"
+
+volumes:
+- name: config
+  path: /config
+  file: redis.conf
+  data:
+    redis.conf: |
+      loglevel verbose
+      maxclients 10240
+      maxmemory 234881024
+      maxmemory-policy noeviction
+      slowlog-log-slower-than 10000
+      slowlog-max-len 32
+- name: data
+  path: /data
+  perpetual: disable
+  pvc:
+    size: "${SIZE}"
+
+priority: "database"
+
+deploy:
+  strategy: Recreate
+
+containers:
+- name: app
+  entrypoint:
+    - 'docker-entrypoint.sh'
+  command:
+    - 'redis-server'
+    - '/config/redis.conf'
+  ports:
+    - containerPort: 6379
+  cpu:
+    request: 1000m
+    limit: 1000m
+  memory:
+    request: 1Gi
+    limit: 1Gi
+  probe:
+    exec:
+      - redis-cli
+      - -h
+      - localhost
+      - ping
+
+svc:
+  ports:
+  - name: tcp
+    port: 6379
+    targetPort: 6379

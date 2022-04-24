@@ -1,0 +1,17 @@
+{
+  "helm": {
+    "repo": {
+      "name": "cockroachdb",
+      "url": "https://charts.cockroachdb.com/"
+    },
+    "chart": {
+      "name": "cockroachdb",
+      "version": "7.0.0"
+    }
+  },
+  "service": {
+    "host": "",
+    "port": ""
+  },
+  "notes": ""
+}

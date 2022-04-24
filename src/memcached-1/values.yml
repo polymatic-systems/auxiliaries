@@ -1,0 +1,32 @@
+
+default:
+  name: "${AUX_SERVICE_RELEASE}"
+  version: "${AUX_VERSION}"
+  image: docker.io/library/memcached:1.6-bullseye
+  slug: "${AUX_PREFIX}"
+
+containers:
+- name: app
+  entrypoint:
+    - 'docker-entrypoint.sh'
+  command:
+    - 'memcached'
+    - '-m'
+    - '96'
+    - '-vv'
+  ports:
+    - containerPort: 11211
+  cpu:
+    request: 1000m
+    limit: 1000m
+  memory:
+    request: 1Gi
+    limit: 1Gi
+  probe:
+    path: disable
+
+svc:
+  ports:
+  - name: tcp
+    port: 11211
+    targetPort: 11211

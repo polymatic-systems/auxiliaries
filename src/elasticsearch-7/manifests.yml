@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: Secret
+type: Opaque
+metadata:
+  name: ${AUX_SERVICE_RELEASE}-es-elastic-user
+stringData:
+  ${USER}: '${PASSWORD}'
+---
+apiVersion: elasticsearch.k8s.elastic.co/v1
+kind: Elasticsearch
+metadata:
+  name: ${AUX_SERVICE_RELEASE}
+spec:
+  version: 7.12.1
+  volumeClaimDeletePolicy: DeleteOnScaledownAndClusterDeletion
+  updateStrategy:
+    changeBudget:
+      maxSurge: -1
+      maxUnavailable: 1
+  http:
+    tls: 
+      selfSignedCertificate:
+        disabled: true
+  nodeSets:
+  - name: default
+    count: 1
+    config:
+      node.roles: ["master", "data", "ingest"]
+      node.store.allow_mmap: false
+      xpack.security.authc:
+        anonymous:
+          username: anonymous
+          roles: superuser
+          authz_exception: false
+    volumeClaimTemplates:
+      - metadata:
+          name: ${AUX_SERVICE_RELEASE}-elasticsearch-data
+        spec:
+          accessModes:
+          - ReadWriteOnce
+          resources:
+            requests:
+              storage: ${SIZE}
+    podTemplate:
+      spec:
+        containers:
+        - name: elasticsearch
+          env:
+          - name: ES_JAVA_OPTS
+            value: '-Xms2048m -Xmx2048m'
+          - name: ELASTIC_PASSWORD
+            value: ''
+          - name: ELASTIC_USERNAME
+            value: 'elastic'
+          resources:
+            requests:
+              cpu: 1000m
+              memory: 3Gi
+            limits:
+              cpu: 1000m
+              memory: 3Gi

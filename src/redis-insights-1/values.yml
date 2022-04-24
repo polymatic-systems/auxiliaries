@@ -1,0 +1,48 @@
+
+default:
+  name: "${AUX_SERVICE_RELEASE}"
+  version: "${AUX_VERSION}"
+  image: docker.io/redislabs/redisinsight:1.8.0
+  slug: "${AUX_PREFIX}"
+
+deploy:
+  strategy: Recreate
+
+containers:
+- name: app
+  ports:
+    - containerPort: 8001
+  cpu:
+    request: 50m
+    limit: 1000m
+  memory:
+    request: 128Mi
+    limit: 1Gi
+  probe:
+    path: /
+    port: 8001
+
+volumes:
+- name: db
+  path: /db
+  pvc:
+    size: ${SIZE}
+
+svc:
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8001
+
+conceal: ${ENDPOINT_DISABLE}
+
+ingress:
+- name: redis-insights
+  issuer: "${ENDPOINT_ISSUER}"
+  cert: "${ENDPOINT_CERT}"
+  annotations:
+    external-dns.io/status: "${ENDPOINT_STATUS}"
+    nginx.ingress.kubernetes.io/auth-url: "http://oauth2-oauth2-proxy.authentication.svc.cluster.local/oauth2/auth"
+    nginx.ingress.kubernetes.io/auth-signin: "https://proxy.${AUX_SERVICE_URL}/oauth2/start?rd=$escaped_request_uri"
+  urls:
+  - "${ENDPOINT_URL}"

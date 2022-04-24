@@ -1,0 +1,48 @@
+
+default:
+  name: "${AUX_SERVICE_RELEASE}"
+  version: "${AUX_VERSION}"
+  image: docker.io/sosedoff/pgweb:0.11.6
+  slug: "${AUX_PREFIX}"
+
+variables:
+- name: database
+  data:
+    DATABASE_URL: "${PGWEB_POSTGRESQL_URL}"
+
+containers:
+- name: app
+  ports:
+    - containerPort: 8081
+  cpu:
+    request: 100m
+    limit: 100m
+  memory:
+    request: 128Mi
+    limit: 128Mi
+  probe:
+    path: /
+    port: 8081
+
+svc:
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8081
+
+conceal: ${ENDPOINT_DISABLE}
+
+ingress:
+- name: pgweb
+  issuer: "${ENDPOINT_ISSUER}"
+  cert: "${ENDPOINT_CERT}"
+  annotations:
+    external-dns.io/status: "${ENDPOINT_STATUS}"
+    nginx.ingress.kubernetes.io/auth-url: "http://oauth2-oauth2-proxy.authentication.svc.cluster.local/oauth2/auth"
+    nginx.ingress.kubernetes.io/auth-signin: "https://proxy.${AUX_SERVICE_URL}/oauth2/start?rd=$escaped_request_uri"
+  urls:
+  - "${ENDPOINT_URL}"
+
+hpa:
+  min: ${POD_COUNT}
+  max: ${POD_COUNT}

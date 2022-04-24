@@ -1,0 +1,17 @@
+{
+  "helm": {
+    "repo": {
+      "name": "polymatic",
+      "url": "https://polymatic-systems.github.io/helm-charts"
+    },
+    "chart": {
+      "name": "genero",
+      "version": "1.2.0"
+    }
+  },
+  "service": {
+    "host": "memcached",
+    "port": "11211"
+  },
+  "notes": ""
+}
