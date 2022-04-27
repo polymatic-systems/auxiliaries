@@ -13,6 +13,5 @@
     "host": "",
     "port": ""
   },
-  "notes": "you can find the complete instructions for setting up your database for pghero here:\nhttps://github.com/ankane/pghero/blob/master/guides/Query-Stats.md\nhttps://github.com/ankane/pghero/blob/master/guides/Permissions.md
-\nhttps://github.com/ankane/pghero/blob/master/guides/Linux.md#query-stats"
+  "notes": "you can find the complete instructions for setting up your database for pghero here:\nhttps://github.com/ankane/pghero/blob/master/guides/Query-Stats.md\nhttps://github.com/ankane/pghero/blob/master/guides/Permissions.md\nhttps://github.com/ankane/pghero/blob/master/guides/Linux.md#query-stats"
 }
