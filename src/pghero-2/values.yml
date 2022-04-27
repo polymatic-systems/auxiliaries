@@ -5,7 +5,7 @@ default:
   image: docker.io/ankane/pghero:v2.8.1
   slug: "${AUX_PREFIX}"
 
-secret:
+variables:
 - name: url
   data:
     DATABASE_URL: "${PGHERO_POSTGRESQL_URL}"
