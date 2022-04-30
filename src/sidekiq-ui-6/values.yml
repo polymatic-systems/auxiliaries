@@ -2,7 +2,7 @@
 default:
   name: "${AUX_SERVICE_RELEASE}"
   version: "${AUX_VERSION}"
-  image: docker.io/polymatic/sidekiq-ui:5.1
+  image: docker.io/polymatic/sidekiq-ui:6.4
   slug: "${AUX_PREFIX}"
 
 variables:
