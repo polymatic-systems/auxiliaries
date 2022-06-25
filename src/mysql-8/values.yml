@@ -1,0 +1,75 @@
+
+default:
+  name: "${AUX_SERVICE_RELEASE}"
+  version: "${AUX_VERSION}"
+  image: docker.io/library/mysql:8-debian
+  slug: "${AUX_PREFIX}"
+
+variables:
+- name: init
+  data:
+    MYSQL_USER: "${USER}"
+    MYSQL_PASSWORD: "${PASSWORD}"
+    MYSQL_ROOT_PASSWORD: "${PASSWORD}"
+    MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+
+volumes:
+- name: config
+  path: /etc/mysql/conf.d
+  file: config.cnf
+  data:
+    config.conf: |
+      init_connect = 'SELECT CURRENT_USER();'
+      connect_timeout = 4
+      max_connections = 100
+      max_connect_errors = 9999
+      interactive_timeout = 259200
+      wait_timeout = 86400
+      lower_case_table_names = 1
+      max_error_count = 255
+      query_cache_type = 1
+      query_cache_limit	= 1M
+      query_cache_size = 8M
+      log_warnings = 2
+      log_error = /var/logs/error.log
+      log_output = FILE
+      general_log_file = /var/logs/general.log
+      general_log = 0
+      slow_query_log_file	= /var/logs/slow.log
+      slow_query_log = 1
+      long_query_time = 1
+      log_queries_not_using_indexes = 1
+      expire_logs_days = 2
+- name: data
+  path: /var/lib/mysql
+  perpetual: disable
+  pvc:
+    size: "${SIZE}"
+
+priority: "database"
+
+deploy:
+  strategy: Recreate
+
+containers:
+- name: app
+  ports:
+    - containerPort: 3306
+  cpu:
+    request: 1000m
+    limit: 1000m
+  memory:
+    request: 4Gi
+    limit: 4Gi
+  probe:
+    exec:
+      - mysqladmin
+      - ping
+      - -h
+      - localhost
+
+svc:
+  ports:
+  - name: tcp
+    port: 3306
+    targetPort: 3306
